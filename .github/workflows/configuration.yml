@@ -10,7 +10,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Update DNS
-        run: curl -X POST "https://api.cloudflare.com/client/v4/zones/$ZONE/dns_records/import" -H "X-Auth-Email: $APIEMAIL" -H "X-Auth-Key: $APIKEY" --form 'file=@$FILE' --form 'proxied=$PROXIED'
+        run: |
+          curl -X POST "https://api.cloudflare.com/client/v4/zones/$ZONE/dns_records/import" -H "X-Auth-Email: $APIEMAIL" -H "X-Auth-Key: $APIKEY" --form 'file=@$FILE' --form 'proxied=$PROXIED'
         env:
           ZONE: ${{ secrets.zone }}
           APIEMAIL: ${{ secrets.apiemail }}
