@@ -10,6 +10,3 @@ dynamoosejs.com.	1	IN	A	185.199.108.153
 dynamoosejs.com.	1	IN	A	185.199.109.153
 dynamoosejs.com.	1	IN	A	185.199.110.153
 dynamoosejs.com.	1	IN	A	185.199.111.153
-
-;; TXT Records
-tmptxtrecord.dynamoosejs.com. 1 IN  TXT "tmp"
