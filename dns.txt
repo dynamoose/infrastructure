@@ -1,9 +1,0 @@
-;;
-;; Domain:     dynamoosejs.com.
-;;
-;;
-;; SOA Record
-dynamoosejs.com.	3600	IN	SOA	dynamoosejs.com. root.dynamoosejs.com. 2033915601 7200 3600 86400 3600
-
-;; CNAME Records
-dynamoosejs.com.	1	IN	CNAME	dynamoosejs.com.s3-website-us-west-2.amazonaws.com.

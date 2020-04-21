@@ -7,12 +7,32 @@ on:
 jobs:
   update_dns:
     runs-on: ubuntu-latest
+    env:
+      TF_VAR_zone: ${{ secrets.zone }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.apitoken }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      TERRAFORM_VERSION: 0.12.24
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
     steps:
       - uses: actions/checkout@v2
-      - name: Update DNS
-        run: |
-          curl -X POST "https://api.cloudflare.com/client/v4/zones/$ZONE/dns_records/import" -H "Authorization: Bearer $TOKEN" --form 'file=@dns.txt' --form 'proxied=$PROXIED'
-        env:
-          TOKEN: ${{ secrets.apitoken }}
-          ZONE: ${{ secrets.zone }}
-          PROXIED: true
+      - name: Terraform Format
+        uses: hashicorp/terraform-github-actions@master
+        with:
+          tf_actions_version: ${{ env.TERRAFORM_VERSION }}
+          tf_actions_subcommand: 'fmt'
+      - name: Terraform Init
+        uses: hashicorp/terraform-github-actions@master
+        with:
+          tf_actions_version: ${{ env.TERRAFORM_VERSION }}
+          tf_actions_subcommand: 'init'
+      - name: Terraform Validate
+        uses: hashicorp/terraform-github-actions@master
+        with:
+          tf_actions_version: ${{ env.TERRAFORM_VERSION }}
+          tf_actions_subcommand: 'validate'
+      - name: Terraform Plan
+        uses: hashicorp/terraform-github-actions@master
+        with:
+          tf_actions_version: ${{ env.TERRAFORM_VERSION }}
+          tf_actions_subcommand: 'plan'
