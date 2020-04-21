@@ -11,10 +11,9 @@ jobs:
       - uses: actions/checkout@v2
       - name: Update DNS
         run: |
-          curl -X POST "https://api.cloudflare.com/client/v4/zones/$ZONE/dns_records/import" -H "X-Auth-Email: $APIEMAIL" -H "X-Auth-Key: $APIKEY" --form 'file=@$FILE' --form 'proxied=$PROXIED'
+          curl -X POST "https://api.cloudflare.com/client/v4/zones/$ZONE/dns_records/import" -H "Authorization: Bearer $TOKEN" --form 'file=@$FILE' --form 'proxied=$PROXIED'
         env:
+          TOKEN: ${{ secrets.apitoken }}
           ZONE: ${{ secrets.zone }}
-          APIEMAIL: ${{ secrets.apiemail }}
-          APIKEY: ${{ secrets.apikey }}
           FILE: dns.txt
           PROXIED: true
