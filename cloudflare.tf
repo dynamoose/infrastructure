@@ -14,3 +14,11 @@ resource "cloudflare_record" "dynamoosejs_com" {
   proxied = true
 }
 
+resource "cloudflare_record" "tmptextrecord_dynamoosejs_com" {
+  zone_id = var.zone
+  name    = "tmptextrecord.dynamoosejs.com"
+  value   = "helloworld"
+  type    = "TXT"
+  ttl     = 1
+  proxied = false
+}
