@@ -1,6 +1,6 @@
-# dynamoosejs/site
+# dynamoosejs/infrastructure
 
-This repository is responsible for housing and managing the settings and configuration for [dynamoosejs.com](https://dynamoosejs.com).
+This repository is responsible for housing and managing the settings and configuration for Dynamoose infrastructure, primarily [dynamoosejs.com](https://dynamoosejs.com).
 
 ## Providers
 
@@ -11,7 +11,7 @@ This repository is responsible for housing and managing the settings and configu
 
 Currently this repositoiry manages the following:
 
-- DNS Settings (ex. updating the [`dns.txt`](dns.txt) file on the `master branch` will update the actual DNS settings in Cloudflare)
+- DNS Settings (ex. updating the [`cloudflare.tf`](cloudflare.tf) file on the `master branch` will update the actual DNS settings in Cloudflare)
 
 We are considering expanding this in the future to include:
 
