@@ -36,3 +36,8 @@ jobs:
         with:
           tf_actions_version: ${{ env.TERRAFORM_VERSION }}
           tf_actions_subcommand: 'plan'
+      - name: Terraform Apply
+        uses: hashicorp/terraform-github-actions@master
+        with:
+          tf_actions_version: ${{ env.TERRAFORM_VERSION }}
+          tf_actions_subcommand: 'apply'
