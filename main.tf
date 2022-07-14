@@ -2,9 +2,6 @@ provider "aws" {
   region  = "us-west-2"
 }
 
-variable "AWS_BACKEND_ACCESS_KEY" {}
-variable "AWS_BACKEND_SECRET_KEY" {}
-
 terraform {
   required_providers {
     aws = {
@@ -19,8 +16,6 @@ terraform {
   }
 
   backend "s3" {
-    access_key     = var.AWS_BACKEND_ACCESS_KEY
-    secret_key     = var.AWS_BACKEND_SECRET_KEY
     region         = "us-west-2"
 
     bucket         = "dynamoosejs-ci-terraform-state-storage"
