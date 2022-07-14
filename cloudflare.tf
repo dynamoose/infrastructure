@@ -1,5 +1,14 @@
 variable "zone" {}
 
+resource "cloudflare_record" "test_dynamoosejs_com" {
+  zone_id = var.zone
+  name    = "test.dynamoosejs.com"
+  value   = "HelloWorld"
+  type    = "TXT"
+  ttl     = "1"
+  proxied = true
+}
+
 resource "cloudflare_record" "dynamoosejs_com" {
   zone_id = var.zone
   name    = "dynamoosejs.com"
