@@ -1,9 +1,4 @@
-provider "cloudflare" {
-  version = "~> 2.0"
-}
-
-variable "zone" {
-}
+variable "zone" {}
 
 resource "cloudflare_record" "dynamoosejs_com" {
   zone_id = var.zone

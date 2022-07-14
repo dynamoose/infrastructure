@@ -1,41 +1,109 @@
-name: Configuration
-on: [push, pull_request]
+name: "Terraform"
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
 
 jobs:
   terraform:
+    name: "Terraform"
     runs-on: ubuntu-latest
     env:
       TF_VAR_zone: ${{ secrets.zone }}
       CLOUDFLARE_API_TOKEN: ${{ secrets.apitoken }}
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      TERRAFORM_VERSION: 0.12.24
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2.0.0
+
       - name: Terraform Format
-        uses: hashicorp/terraform-github-actions@master
-        with:
-          tf_actions_version: ${{ env.TERRAFORM_VERSION }}
-          tf_actions_subcommand: 'fmt'
+        id: fmt
+        run: terraform fmt -check
+        continue-on-error: true
+
       - name: Terraform Init
-        uses: hashicorp/terraform-github-actions@master
-        with:
-          tf_actions_version: ${{ env.TERRAFORM_VERSION }}
-          tf_actions_subcommand: 'init'
+        id: init
+        run: terraform init
+
       - name: Terraform Validate
-        uses: hashicorp/terraform-github-actions@master
-        with:
-          tf_actions_version: ${{ env.TERRAFORM_VERSION }}
-          tf_actions_subcommand: 'validate'
+        id: validate
+        run: terraform validate -no-color
+
       - name: Terraform Plan
-        uses: hashicorp/terraform-github-actions@master
+        id: plan
+        if: github.event_name == 'pull_request'
+        run: terraform plan -no-color -input=false
+        continue-on-error: true
+
+      - uses: actions/github-script@v6
+        if: github.event_name == 'pull_request'
+        env:
+          PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
         with:
-          tf_actions_version: ${{ env.TERRAFORM_VERSION }}
-          tf_actions_subcommand: 'plan'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            // 1. Retrieve existing bot comments for the PR
+            const { data: comments } = await github.rest.issues.listComments({
+              "owner": context.repo.owner,
+              "repo": context.repo.repo,
+              "issue_number": context.issue.number
+            })
+            const botComment = comments.find(comment => {
+              return comment.user.type === "Bot" && comment.body.includes("Terraform Format and Style")
+            })
+
+            // 2. Prepare format of the comment
+            const output = `#### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
+            #### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
+            #### Terraform Validation 🤖\`${{ steps.validate.outcome }}\`
+            <details><summary>Validation Output</summary>
+
+            \`\`\`\n
+            ${{ steps.validate.outputs.stdout }}
+            \`\`\`
+
+            </details>
+
+            #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
+
+            <details><summary>Show Plan</summary>
+
+            \`\`\`\n
+            ${process.env.PLAN}
+            \`\`\`
+
+            </details>
+
+            *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Working Directory: \`${{ env.tf_actions_working_dir }}\`, Workflow: \`${{ github.workflow }}\`*`;
+
+            // 3. If we have a comment, update it, otherwise create a new one
+            if (botComment) {
+              github.rest.issues.updateComment({
+                "owner": context.repo.owner,
+                "repo": context.repo.repo,
+                "comment_id": botComment.id,
+                "body": output
+              })
+            } else {
+              github.rest.issues.createComment({
+                "owner": context.repo.owner,
+                "repo": context.repo.repo,
+                "issue_number": context.issue.number,
+                "body": output
+              })
+            }
+
+      - name: Terraform Plan Status
+        if: steps.plan.outcome == 'failure'
+        run: exit 1
+
       - name: Terraform Apply
-        uses: hashicorp/terraform-github-actions@master
-        if: github.event_name == 'push' && github.event.ref == 'refs/heads/main'
-        with:
-          tf_actions_version: ${{ env.TERRAFORM_VERSION }}
-          tf_actions_subcommand: 'apply'
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: terraform apply -auto-approve -input=false
