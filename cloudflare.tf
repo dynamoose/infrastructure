@@ -44,3 +44,11 @@ resource "cloudflare_record" "v2_dynamoosejs_com" {
   ttl     = "1"
   proxied = true
 }
+
+resource "cloudflare_record" "_atproto_dynamoosejs_com" {
+  zone_id = var.zone
+  name    = "_atproto.dynamoosejs.com"
+  value   = "did=did:plc:nhvwjobckl3vhjj5tebcthbz"
+  type    = "TXT"
+  ttl     = "1"
+}
