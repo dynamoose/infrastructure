@@ -45,6 +45,15 @@ resource "cloudflare_record" "v2_dynamoosejs_com" {
   proxied = true
 }
 
+resource "cloudflare_record" "v3_dynamoosejs_com" {
+  zone_id = var.zone
+  name    = "v3.dynamoosejs.com"
+  value   = "v3.dynamoosejs.com.s3-website-us-west-2.amazonaws.com"
+  type    = "CNAME"
+  ttl     = "1"
+  proxied = true
+}
+
 resource "cloudflare_record" "_atproto_dynamoosejs_com" {
   zone_id = var.zone
   name    = "_atproto.dynamoosejs.com"
