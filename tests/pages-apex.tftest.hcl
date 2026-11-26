@@ -7,6 +7,11 @@ variables {
 run "unconfigured" {
   command = plan
 
+  variables {
+    # Use the unconfigured case even when Terraform loads the live site input.
+    pages_apex = null
+  }
+
   assert {
     condition     = cloudflare_record.dynamoosejs_com.value == "dmz8ymrutkf3e.cloudfront.net" && cloudflare_record.dynamoosejs_com.proxied
     error_message = "An unconfigured Pages site must keep serving the apex through CloudFront and the Cloudflare proxy."
